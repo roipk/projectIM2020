@@ -5,3 +5,12 @@ from scipy import ndimage
 from matplotlib import pyplot as plt
 from PIL import Image
 
+
+
+
+class projectIM2020_q2:
+    pass
+
+
+if __name__ =="__main__":
+    pass
