@@ -35,14 +35,14 @@ class projectIM2020_q3:
         # otherwise, apply a perspective warp to stitch the images
         # together
         (matches, H, status) = M
-        if len(matches) < 20:
-            return (None, None)
-
-        result = cv2.warpPerspective(imageA, H,(imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
+        print(len(matches)//2)
+        result = cv2.warpPerspective(imageA, H,
+                                     (imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
         result[0:imageB.shape[0], 0:imageB.shape[1]] = imageB
         # check to see if the keypoint matches should be visualized
         if showMatches:
-            vis = self.drawMatches(imageA, imageB, kpsA, kpsB, matches,status)
+            vis = self.drawMatches(imageA, imageB, kpsA, kpsB, matches,
+                                   status)
             # return a tuple of the stitched image and the
             # visualization
             return (result, vis)
@@ -106,6 +106,16 @@ class projectIM2020_q3:
         vis = np.zeros((max(hA, hB), wA + wB, 3), dtype="uint8")
         vis[0:hA, 0:wA] = imageA
         vis[0:hB, wA:] = imageB
+        # loop over the matches
+        for ((trainIdx, queryIdx), s) in zip(matches, status):
+            # only process the match if the keypoint was successfully
+            # matched
+            if s == 1:
+                # draw the match
+                ptA = (int(kpsA[queryIdx][0]), int(kpsA[queryIdx][1]))
+                ptB = (int(kpsB[trainIdx][0]) + wA, int(kpsB[trainIdx][1]))
+                cv2.line(vis, ptA, ptB, (0, 255, 0), 1)
+        # return the visualization
         return vis
 
 
@@ -157,6 +167,8 @@ if __name__ =="__main__":
     path2 = os.getcwd() + "\\ex3"
     images1 = ex3.get_database_image(path1)
     images2 = ex3.get_database_image(path2)
+    # img1 = images1[1]
+    # img2 = images2[1]
     for img1 in images1:
         for img2 in images2:
             imageA = img1
@@ -177,7 +189,12 @@ if __name__ =="__main__":
             if vis is not None:
                 plt.imshow(vis)
                 plt.show()
-
+            elif imageA.shape == newImage.shape:
+                 plt.imshow(imageA)
+                 plt.show()
+            else:
+                plt.imshow(imageB)
+                plt.show()
 
 
 
