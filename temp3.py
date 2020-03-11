@@ -1,3 +1,4 @@
+
 import os
 from scipy import ndimage
 from matplotlib import pyplot as plt
@@ -35,7 +36,10 @@ class projectIM2020_q3:
         # otherwise, apply a perspective warp to stitch the images
         # together
         (matches, H, status) = M
-        print(len(matches)//2)
+        if len(matches)<30:
+            return (None, None)
+        print(len(matches))
+
         result = cv2.warpPerspective(imageA, H,
                                      (imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
         result[0:imageB.shape[0], 0:imageB.shape[1]] = imageB
@@ -189,12 +193,10 @@ if __name__ =="__main__":
             if vis is not None:
                 plt.imshow(vis)
                 plt.show()
-            elif imageA.shape == newImage.shape:
-                 plt.imshow(imageA)
-                 plt.show()
-            else:
-                plt.imshow(imageB)
-                plt.show()
+
+
+
+
 
 
 

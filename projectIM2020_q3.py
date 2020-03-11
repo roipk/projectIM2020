@@ -35,7 +35,7 @@ class projectIM2020_q3:
         # otherwise, apply a perspective warp to stitch the images
         # together
         (matches, H, status) = M
-        if len(matches) < 20:
+        if len(matches) <= 31:
             return (None, None)
 
         result = cv2.warpPerspective(imageA, H,(imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
@@ -52,6 +52,7 @@ class projectIM2020_q3:
     def detectAndDescribe(self, image):
         # convert the image to grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.Canny(gray, 50, 200, apertureSize=3)
         # check to see if we are using OpenCV 3.X
         if self.isv3:
             # detect and extract features from the image
@@ -110,9 +111,9 @@ class projectIM2020_q3:
 
 
 
-    def get_database_image(self,path):
+    def get_database_images(self,path,end):
         image_list =[]
-        for filename in glob.glob(path + '/*.png'):
+        for filename in glob.glob(path + '/*'+end):
             im = cv2.imread(filename)
             image_list.append(im)
         return  image_list
@@ -155,8 +156,8 @@ if __name__ =="__main__":
     ex3 = projectIM2020_q3()
     path1 = os.getcwd() + "\\ex2"
     path2 = os.getcwd() + "\\ex3"
-    images1 = ex3.get_database_image(path1)
-    images2 = ex3.get_database_image(path2)
+    images1 = ex3.get_database_images(path1,'.png')
+    images2 = ex3.get_database_images(path2,'.png')
     for img1 in images1:
         for img2 in images2:
             imageA = img1
