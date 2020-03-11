@@ -35,7 +35,7 @@ class projectIM2020_q5:
         # otherwise, apply a perspective warp to stitch the images
         # together
         (matches, H, status) = M
-        if len(matches) <= 31:
+        if len(matches) <= 30:
             return (None, None)
         print(len(matches))
         result = cv2.warpPerspective(imageA, H,(imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
@@ -115,7 +115,7 @@ class projectIM2020_q5:
         image_list =[]
         for filename in glob.glob(path + '/*'+end):
             im = cv2.imread(filename)
-            image_list.append(im)
+            image_list.append((im,filename))
         return  image_list
 
 
@@ -154,14 +154,14 @@ class projectIM2020_q5:
 if __name__ =="__main__":
 
     ex5 = projectIM2020_q5()
-    path1 = os.getcwd() + "\ex5\q3"
-    path2 = os.getcwd() + "\ex5\q4"
-    images1 = ex5.get_database_images(path1,'.png')
-    images2 = ex5.get_database_images(path2,'.jpg')
+    path1 = os.getcwd() + "\ex5\q4" #real database - jpg
+    path2 = os.getcwd() + "\ex5\q2" #sign database - png
+    images1 = ex5.get_database_images(path1,'.jpg')
+    images2 = ex5.get_database_images(path2,'.png')
     for img1 in images1:
         for img2 in images2:
-            imageA = img1
-            imageB = img2
+            imageA = img1[0]
+            imageB = img2[0]
             imageA = imutils.resize(imageA, width=400)
             imageB = imutils.resize(imageB, width=400)
             newImage = ex5.addBlackToImage(imageA,imageB)
@@ -169,13 +169,16 @@ if __name__ =="__main__":
             if imageA.shape == newImage.shape:
                 imageB = newImage
             else:
-                imageA = newImage
+                imageA = imageB
+                imageB = newImage
 
 
             # stitch the images together to create a panorama
             stitcher =  projectIM2020_q5()
             (result, vis) = stitcher.stitch([imageA, imageB], showMatches=True)
             if vis is not None:
+                print('\n\nq4 -> '+ img1[1],'\nq3 -> '+img2[1])
+
                 plt.imshow(vis)
                 plt.show()
 

@@ -154,8 +154,8 @@ class projectIM2020_q3:
 if __name__ =="__main__":
 
     ex3 = projectIM2020_q3()
-    path1 = os.getcwd() + "\\ex2"
-    path2 = os.getcwd() + "\\ex3"
+    path1 = os.getcwd() + "\\ex2" #databases
+    path2 = os.getcwd() + "\\ex3" #half images
     images1 = ex3.get_database_images(path1,'.png')
     images2 = ex3.get_database_images(path2,'.png')
     for img1 in images1:
@@ -168,15 +168,18 @@ if __name__ =="__main__":
 
             if imageA.shape == newImage.shape:
                 imageB = newImage
-            else:
-                imageA = newImage
 
+            else:
+                imageA = imageB
+                imageB = newImage
 
             # stitch the images together to create a panorama
             stitcher =  projectIM2020_q3()
             (result, vis) = stitcher.stitch([imageA, imageB], showMatches=True)
             if vis is not None:
                 plt.imshow(vis)
+                plt.xticks([])
+                plt.yticks([])
                 plt.show()
 
 
