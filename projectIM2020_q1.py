@@ -5,6 +5,7 @@ import os
 from scipy import ndimage
 from matplotlib import pyplot as plt
 from PIL import Image
+from PIL import ImageFilter
 
 
 imageDatabase = {}
@@ -99,11 +100,11 @@ class projectIM2020_q1:
 
         return img
 
-    def refersMS(self, filter):
-        f = np.fft.ifft2(img)  # transform image with fourier
-        # fshift = np.fft.fftshift(f)
-        # magniude_spctrume = 20 * np.log(np.abs(f))
-        return f
+    # def refersMS(self, filter):
+    #     f = np.fft.ifft2(img)  # transform image with fourier
+    #     # fshift = np.fft.fftshift(f)
+    #     # magniude_spctrume = 20 * np.log(np.abs(f))
+    #     return f
 
     def findWhit(self, img):
         height, width = img.shape
@@ -135,29 +136,59 @@ if __name__ =="__main__":
     path = os.getcwd() + "\\ex1"
     images = ex1.get_database_images(path,'.jpg')
     for view in images:
-        img = cv2.cvtColor(view, cv2.COLOR_BGR2GRAY)
-        img = cv2.medianBlur(img, 23)
-        kernel = np.ones((3, 3), np.uint8)
-        canny = cv2.Canny(img,120,200)
-        img = cv2.morphologyEx(img,cv2.MORPH_OPEN, kernel)
-        test = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-        plt.imshow(test, cmap='gray')  # , plt.xticks([]), plt.yticks([])
+        kernel = np.array([[0, 1, 1, 1, 0],
+                           [1, 0, 0, 0, 1],
+                           [1, 0, -8, 0, 1],
+                           [1, 0, 0, 0, 1],
+                           [0, 1, 1, 1, 0]], np.uint8)
+        im = cv2.morphologyEx(view, cv2.MORPH_CLOSE, kernel)
+        im = cv2.morphologyEx(im, cv2.MORPH_OPEN, kernel)
+        im = cv2.Canny(im,10,70)
+        # im = cv2.morphologyEx(im, cv2.MORPH_OPEN, kernel)
+        im = cv2.adaptiveThreshold(im, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        im = cv2.medianBlur(im, 21)
+        im = cv2.filter2D(im, -1, kernel)
+
+        plt.imshow(im, cmap='gray')  # , plt.xticks([]), plt.yticks([])
         plt.show()
+
 
 
 
         # img = cv2.cvtColor(view, cv2.COLOR_BGR2GRAY)
-        # # edge = cv2.Canny(img,120,200)
-        img = cv2.GaussianBlur(test,(7,7),0)
-        img3d = view
-        imgMS = ex1.MS(img)
-        mask = ex1.mask(img, 7)
-        ft = imgMS * mask
-        revers = np.fft.ifft2(ft)
-        findPix = ex1.findWhit(revers)
-        i = ex1.addPic(img3d, findPix)
-        plt.imshow(np.abs(i), cmap='gray')  # , plt.xticks([]), plt.yticks([])
-        plt.show()
+        # img = cv2.medianBlur(img, 33)
+        # kernel = np.ones((3, 3), np.uint8)
+        # kernel = np.array([[0, 1, 1, 1, 0],
+        #                    [1, 0, 0, 0, 1],
+        #                    [1, 0, -8, 0, 1],
+        #                    [1, 0, 0, 0, 1],
+        #                    [0, 1, 1, 1, 0]], np.uint8)
+        # canny = cv2.Canny(img,120,200)
+        # img = cv2.morphologyEx(img,cv2.MORPH_OPEN, kernel)
+        # test = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        # # plt.imshow(test, cmap='gray')  # , plt.xticks([]), plt.yticks([])
+        # # plt.show()
+        #
+        # fast = cv2.FastFeatureDetector()
+        #
+        # # find and draw the keypoints
+        # kp = fast.detect(img, None)
+        # img2 = cv2.drawKeypoints(view, kp, color=(255, 0, 0))
+        # plt.imshow(img2, cmap='gray')  # , plt.xticks([]), plt.yticks([])
+        # plt.show()
+
+        # # img = cv2.cvtColor(view, cv2.COLOR_BGR2GRAY)
+        # # # edge = cv2.Canny(img,120,200)
+        # img = cv2.GaussianBlur(test,(7,7),0)
+        # img3d = view
+        # imgMS = ex1.MS(img)
+        # mask = ex1.mask(img, 7)
+        # ft = imgMS * mask
+        # revers = np.fft.ifft2(ft)
+        # findPix = ex1.findWhit(revers)
+        # i = ex1.addPic(img3d, findPix)
+        # plt.imshow(np.abs(i), cmap='gray')  # , plt.xticks([]), plt.yticks([])
+        # plt.show()
 
 
 
